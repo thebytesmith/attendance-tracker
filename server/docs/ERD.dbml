@@ -1,0 +1,91 @@
+// Database Markup Language (DBML) specification
+// Import into https://dbdiagram.io to generate visual ERD
+
+Table users {
+id ObjectId [pk]
+email varchar [unique, not null]
+passwordHash varchar [not null]
+fullname varchar [not null]
+role varchar [not null] // 'admin', 'teacher'
+refreshToken varchar [not null]
+isActive boolean [default: true]
+createdAt timestamp
+updatedAt timestamp
+}
+
+Table classes {
+id ObjectId [pk]
+name varchar [not null]
+semester int [not null]
+section varchar
+academicYear varchar [not null]
+isActive boolean [default: true]
+createdAt timestamp
+updatedAt timestamp
+}
+
+Table students {
+id ObjectId [pk]
+fullname varchar [not null]
+enrollNum varchar [unique, not null]
+email varchar [unique, not null]
+classId ObjectId [not null]
+isActive boolean [default: true]
+createdAt timestamp
+updatedAt timestamp
+}
+
+Table subjects {
+id ObjectId [pk]
+code varchar [unique]
+name varchar
+instructorId ObjectId [not null]
+classId ObjectId [not null]
+isActive boolean [default: true]
+createdAt timestamp
+updatedAt timestamp
+}
+
+Table lectureSchedules {
+id ObjectId [pk]
+subjectId ObjectId [not null]
+dayOfWeek int [not null] // 0-6 (Sun-Sat)
+startTime varchar [not null] // HH:MM format
+endTime varchar [not null] // HH:MM format
+isActive boolean [default: true]
+createdAt timestamp
+updatedAt timestamp
+}
+
+Table lectures {
+id ObjectId [pk]
+subjectId ObjectId [not null]
+date date [not null]
+startTime varchar [not null] // HH:MM format
+endTime varchar [not null] // HH:MM format
+type varchar [not null] // 'regular', 'extra'
+createdAt timestamp
+updatedAt timestamp
+}
+
+Table attendance {
+id ObjectId [pk]
+lectureId ObjectId [not null]
+studentId ObjectId [not null]
+status varchar [not null] // 'present', 'absent'
+createdAt timestamp
+updatedAt timestamp
+
+indexes {
+(lectureId, studentId) [unique]
+}
+}
+
+// Relationships
+Ref: classes.id < students.classId
+Ref: classes.id < subjects.classId
+Ref: users.id < subjects.instructorId
+Ref: subjects.id < lectureSchedules.subjectId
+Ref: subjects.id < lectures.subjectId
+Ref: lectures.id < attendance.lectureId
+Ref: students.id < attendance.studentId
